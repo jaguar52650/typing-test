@@ -1,15 +1,15 @@
 <template>
+  <async-type-area typing-text="hello World!"></async-type-area>
   <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3.0 + Vite" />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 
+import {  defineAsyncComponent } from 'vue'
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
+    asyncTypeArea: defineAsyncComponent(() => import('./components/TypeArea.vue')),
+  },
 }
 </script>
