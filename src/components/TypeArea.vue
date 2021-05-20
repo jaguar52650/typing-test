@@ -1,12 +1,10 @@
 <template>
     <div>
-        Info {{charsRepMinute}}
+        Info {{getStatistic}}
         <div class="chars">
-            <div v-for="(currentChar,index) in chars" v-bind:class="currentChar.getClass(index)">
-                {{currentChar.char}}____
-                {{currentChar.error}}____
-                {{currentChar.time/1e3}}
-            </div>
+            <span v-for="(currentChar,index) in chars" v-bind:class="currentChar.getClass(index)">
+                {{currentChar.char}}
+            </span>
         </div>
     </div>
 </template>
@@ -48,6 +46,7 @@
                 this.position < this.text.length
                 && e.key === this.text[this.position].char
             ) {
+                //todo суррогатные пары
                 this.nextCharStep()
             } else {
                 //todo only symbols
@@ -131,7 +130,7 @@
             chars() {
                 return this.engine.text
             },
-            charsRepMinute() {
+            getStatistic() {
                 return this.engine.getStatistic()
             }
         },
