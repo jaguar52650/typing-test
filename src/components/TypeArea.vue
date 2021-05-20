@@ -1,6 +1,5 @@
 <template>
     <div>
-        Info {{getStatistic}}
         <div class="chars">
             <p v-for="para in getParas">
                 <span v-for="currentChar in para" v-bind:class="currentChar.getClass()">
@@ -8,6 +7,9 @@
                 </span>
             </p>
         </div>
+        <div>Скорость: {{getStatistic.speed}} Знаков в минуту</div>
+        <div>Точность: {{getStatistic.accuracy.toFixed(1)}} %</div>
+        <!--        Info {{getStatistic}}-->
     </div>
 </template>
 
@@ -72,19 +74,20 @@
         }
 
         keyDown(e) {
-            console.log(e.key)
-            if (this.position === 0) this.startTimer()
-            if (
-                this.position < this.text.length
-                && e.key === this.text[this.position].char
-            ) {
-                //todo суррогатные пары
-                this.nextCharStep()
-            } else {
-                //todo only symbols
-                if (this.position < this.text.length) {
-                    this.text[this.position].error++
-                    this.errors++
+            if(e.key != 'Shift') {
+                if (this.position === 0) this.startTimer()
+                if (
+                    this.position < this.text.length
+                    && e.key === this.text[this.position].char
+                ) {
+                    //todo суррогатные пары
+                    this.nextCharStep()
+                } else {
+                    //todo only symbols
+                    if (this.position < this.text.length) {
+                        this.text[this.position].error++
+                        this.errors++
+                    }
                 }
             }
         }
@@ -127,9 +130,9 @@
 
         getAccuracy() {
             return Math.max(
-                1000 - Math.round(
+                (1000 - Math.round(
                 (this.errors * 1000) / this.text.length
-                ) / 10,
+                ) / 10)/10,
                 0
             )
         }
@@ -161,21 +164,28 @@
             }
         },
         computed: {
-            chars() {
-                return this.engine.text
-            },
             getStatistic() {
-                return this.engine.getStatistic()
+                return this.engine ? this.engine.getStatistic() :{}
             },
             getParas() {
-                return this.engine.getParas()
+                return this.engine ? this.engine.getParas() : []
             }
         },
+        watch: {
+            typingText: {
+                handler(val) {
+                    this.engine = new typingTest({
+                        text: val.getText()
+                    })
+                },
+                deep: true
+            },
+        },
         created: function () {
+            window.addEventListener('keydown', this.keyDown)
             this.engine = new typingTest({
                 text: this.typingText.getText()
             })
-            window.addEventListener('keydown', this.keyDown)
         },
         unmounted: function () {
             window.removeEventListener('keydown', this.keyDown)
@@ -193,11 +203,14 @@
     .chars {
         padding: 3px;
         line-height: 32px;
-        font-size: 15px;
+        font-size: 21px;
+        text-align: left;
     }
 
     .current {
-        background-color: green
+        background-color: green;
+        padding:3px;
+        color:white;
     }
 
     .error {

@@ -1,17 +1,22 @@
 <template>
-    <div>
+    <div class="container">
+        <h1>Тест скорости печати</h1>
+        <div class="alert alert-danger" role="alert" v-if="getError">
+            {{getError}}
+        </div>
         <async-type-area
                 v-if="getText.hasText()"
                 :typing-text="getText">
         </async-type-area>
-        <button>new test</button>
-        <button>rerun test</button>
+        <button type="button" class="btn btn-warning" @click="startTest">Начать новый тест</button>
     </div>
 </template>
 
 <script>
     import {defineAsyncComponent} from "vue";
     import {mapGetters} from 'vuex'
+
+    import "bootstrap/dist/css/bootstrap.min.css";
 
     export default {
         name: "TypeTest",
@@ -26,12 +31,15 @@
             // this.$store.commit('setText', ['qwerty','uiop'])
         },
         computed: {
-            ...mapGetters(['getText']),
+            ...mapGetters([
+                'getText',
+                'getError'
+            ]),
         },
         methods: {
             startTest() {
+                //todo блокировать кнопку на вермя загрузки
                 this.$store.dispatch('loadBacon', {
-                    // sentences: 5,
                     paras: 2,
                 });
             }

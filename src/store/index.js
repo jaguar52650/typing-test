@@ -22,12 +22,15 @@ const store = createStore({
             state.text.paras = paras
         },
         setError(state, error) {
-            state.text = error
+            state.error = error
         }
     },
     getters: {
         getText(state) {
             return state.text
+        },
+        getError(state) {
+            return state.error
         }
     },
     actions: {
@@ -60,7 +63,6 @@ const store = createStore({
                     context.commit('setError', error)
                 }
             }
-
             xhr.send();
         }
     }
