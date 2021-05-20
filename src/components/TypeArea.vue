@@ -2,41 +2,73 @@
     <div>
         Info {{getStatistic}}
         <div class="chars">
-            <span v-for="(currentChar,index) in chars" v-bind:class="currentChar.getClass(index)">
-                {{currentChar.char}}
-            </span>
+            <p v-for="para in getParas">
+                <span v-for="currentChar in para" v-bind:class="currentChar.getClass()">
+                    {{currentChar.char}}
+                </span>
+            </p>
         </div>
     </div>
 </template>
 
 <script>
+    class Char {
+        constructor({char, engine, position} = {}) {
+            return {
+                char,
+                position,
+                time: 0,
+                timeStart: 0,
+                error: 0,
+                getClass() {
+                    if (engine.position === this.position && this.error) return 'error'
+                    if (engine.position < this.position) return ''
+                    if (engine.position > this.position) return 'success'
+                    return 'current'
+                }
+            }
+        }
+    }
 
-    class type {
+    class typingTest {
+        text = []
+        paras = []
         position = 0
         time = 0
         timeStart = 0
         timerId = null
         errors = 0
 
-        constructor({text = ''} = {}) {
+        constructor({text = []} = {}) {
             this.text = this.makeText(text)
         }
 
         makeText(text = '') {
             let engine = this
-            return Array.from(text) //корректно разбивает суррогатные пары
-                .map(char => ({
-                    char,
-                    time: 0,
-                    timeStart: 0,
-                    error: 0,
-                    getClass(index) {
-                        if (engine.position === index && this.error) return 'error'
-                        if (engine.position < index) return ''
-                        if (engine.position > index) return 'success'
-                        return 'current'
-                    }
-                }))
+            let result = []
+
+            for (let i = 0, k = 0; i < text.length; i++, k += text.length) {
+                let paras = Array.from(text[i])  //корректно разбивает суррогатные пары
+                this.paras[i] = []
+
+                for (let j = 0; j < paras.length; j++) {
+                    let char = paras[j]
+
+                    let newCHar = new Char({
+                        char,
+                        engine,
+                        position: result.length
+                    })
+
+                    this.paras[i][j] = newCHar
+                    result.push(newCHar)
+                }
+            }
+            return result
+        }
+
+        getParas() {
+            return this.paras.map(para => para)
         }
 
         keyDown(e) {
@@ -50,7 +82,7 @@
                 this.nextCharStep()
             } else {
                 //todo only symbols
-                if(this.position < this.text.length) {
+                if (this.position < this.text.length) {
                     this.text[this.position].error++
                     this.errors++
                 }
@@ -119,7 +151,9 @@
 
     export default {
         name: "TypeArea",
-        props: ["typingText"],
+        props: {
+            typingText: Object
+        },
         components: {},
         data() {
             return {
@@ -132,11 +166,14 @@
             },
             getStatistic() {
                 return this.engine.getStatistic()
+            },
+            getParas() {
+                return this.engine.getParas()
             }
         },
         created: function () {
-            this.engine = new type({
-                text: this.typingText
+            this.engine = new typingTest({
+                text: this.typingText.getText()
             })
             window.addEventListener('keydown', this.keyDown)
         },

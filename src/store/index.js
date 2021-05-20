@@ -4,17 +4,30 @@ const store = createStore({
     strict: process.env.NODE_ENV == 'development',
     state() {
         return {
-            text: '',
+            text: {
+                text: '',
+                hasText: function () {
+                    return this.text.length > 0
+                },
+                getText: function () {
+                    return this.text
+                }
+            },
             error: ''
         }
     },
     mutations: {
-        setText(state, text) {
-            state.text = text
+        setText(state, text, paras = [text.length]) {
+            state.text.text = text
+            state.text.paras = paras
         },
         setError(state, error) {
-            console.log(error)
             state.text = error
+        }
+    },
+    getters: {
+        getText(state) {
+            return state.text
         }
     },
     actions: {
@@ -41,26 +54,14 @@ const store = createStore({
 
             xhr.onloadend = function () {
                 if (xhr.response && xhr?.response[0].length) { //'?' not work
-                    if (xhr?.response.length > 1) {
-                        //todo multiple paras
-                        context.commit('setText', xhr.response.toString());
-                    } else {
-                        context.commit('setText', xhr.response[0]);
-                    }
+                    context.commit('setText', xhr.response)
                 } else {
                     let error = xhr.statusText || 'error loading text'
                     context.commit('setError', error)
                 }
-            };
+            }
 
             xhr.send();
-
-        }
-
-    },
-    getters: {
-        getText(state) {
-            return state.text
         }
     }
 })

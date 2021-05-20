@@ -1,6 +1,9 @@
 <template>
     <div>
-        <async-type-area :typing-text="getText" v-if="getText"></async-type-area>
+        <async-type-area
+                v-if="getText.hasText()"
+                :typing-text="getText">
+        </async-type-area>
         <button>new test</button>
         <button>rerun test</button>
     </div>
@@ -20,7 +23,7 @@
         },
         created() {
             this.startTest()
-            // this.$store.commit('setText', 'qwerty')
+            // this.$store.commit('setText', ['qwerty','uiop'])
         },
         computed: {
             ...mapGetters(['getText']),
@@ -29,7 +32,7 @@
             startTest() {
                 this.$store.dispatch('loadBacon', {
                     // sentences: 5,
-                    paras: 3,
+                    paras: 2,
                 });
             }
         }
